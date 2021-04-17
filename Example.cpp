@@ -21,22 +21,45 @@ bool exitf = false;
 //Functions that particle update pointer points to
 void sandUpdate(Particle *p) {
 	engine.setPixelRGB(surface, (*p).x, (*p).y, 0, 0, 0);
-	if (engine.getPixel(surface, (*p).x, (*p).y + 1) == 0) {
+	if (engine.getPixel(surface, (*p).x, (*p).y + 1) == 0 && (*p).y < 299) {
 		(*p).y++;
 	}
-	else if (engine.getPixel(surface, (*p).x + 1, (*p).y + 1) == 0) {
+	else if (engine.getPixel(surface, (*p).x + 1, (*p).y + 1) == 0 && (*p).y < 299) {
 		(*p).y++;
 		(*p).x++;
 	}
-	else if (engine.getPixel(surface, (*p).x - 1, (*p).y + 1) == 0) {
+	else if (engine.getPixel(surface, (*p).x - 1, (*p).y + 1) == 0 && (*p).y < 299) {
 		(*p).y++;
 		(*p).x--;
 	}
-	if ((*p).y > 299) {
-		(*p).y = 299;
+	engine.setPixel(surface, (*p).x, (*p).y, (*p).pixel);
+}
+void waterUpdate(Particle *p) {
+	engine.setPixelRGB(surface, (*p).x, (*p).y, 0, 0, 0);
+	if (engine.getPixel(surface, (*p).x, (*p).y + 1) == 0 && (*p).y < 299) {
+		(*p).y++;
+	}
+	else if (engine.getPixel(surface, (*p).x + 1, (*p).y + 1) == 0 && (*p).y < 299) {
+		(*p).y++;
+		(*p).x++;
+	}
+	else if (engine.getPixel(surface, (*p).x - 1, (*p).y + 1) == 0 && (*p).y < 299) {
+		(*p).y++;
+		(*p).x--;
+	}
+	else if (engine.getPixel(surface, (*p).x + 1, (*p).y) == 0 && (*p).y < 299) {
+		(*p).x++;
+	}
+	else if (engine.getPixel(surface, (*p).x - 1, (*p).y) == 0 && (*p).y < 299) {
+		(*p).x--;
 	}
 	engine.setPixel(surface, (*p).x, (*p).y, (*p).pixel);
 }
+void woodUpdate(Particle *p) {
+	engine.setPixelRGB(surface, (*p).x, (*p).y, 0, 0, 0);
+	engine.setPixel(surface, (*p).x, (*p).y, (*p).pixel);
+}
+
 
 int main(int argc, char **argv) {
 	srand(time(NULL));
@@ -46,12 +69,12 @@ int main(int argc, char **argv) {
 	//Init global and needed variables
 	window = SDL_CreateWindow("Test", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 300, 300, SDL_WINDOW_SHOWN);
 	rend = SDL_CreateRenderer(window, -1, 0);
-	surface = SDL_GetWindowSurface(window);
+	surface = SDL_CreateRGBSurfaceWithFormat(0, 300, 300, 32, SDL_PIXELFORMAT_RGB888);
 	//How to use RGB correctly
-	engine.setPixelRGB(surface, 1, 1, 255, 20, 20);
-	Gore::RGB c = engine.getPixelRGB(surface, 1, 1);
-	std::cout << (unsigned)c.r << std::endl;
-
+	//engine.setPixelRGB(surface, 1, 1, 255, 20, 20);
+//	Gore::RGB c = engine.getPixelRGB(surface, 1, 1);
+//	std::cout << (unsigned)c.r << std::endl;
+	int mode = 1;
 	SDL_Rect testm;
 	testm.x = 0;
 	testm.y = 0;
@@ -66,6 +89,19 @@ int main(int argc, char **argv) {
 			switch (e.type) {
 			case SDL_QUIT:
 				exitf = true;
+				break;
+			case SDL_KEYUP:
+				//Changing particle creation mode
+				switch (e.key.keysym.sym) {
+				case SDLK_r:
+					if (mode < 3) {
+						mode++;
+					}
+					else if (mode > 2) {
+						mode = 1;
+					}
+					break;
+				}
 				break;
 			}
 		}
@@ -82,11 +118,27 @@ int main(int argc, char **argv) {
 		//Gets when left mouse button is down and creates a new particle and pushes it back into particles array
 		if (SDL_GetMouseState(&x, &y) & SDL_BUTTON(SDL_BUTTON_LEFT)) {
 			Particle p;
-			p.x = x;
-			p.y = y;
-			p.pixel = 16776960;
-			p.type = 1;
-			p.update = &sandUpdate;
+			p.type = mode;
+			switch (mode) {
+			case 1:	
+				p.x = x;
+				p.y = y;
+				p.pixel = 16776960;
+				p.update = &sandUpdate;
+				break;
+			case 2:
+				p.x = x;
+				p.y = y;
+				p.pixel = 33023;
+				p.update = &waterUpdate;
+				break;
+			case 3:
+				p.x = x;
+				p.y = y;
+				p.pixel = 4789268;
+				p.update = &woodUpdate;
+				break;
+			}
 			particles.push_back(p);
 		}
 		//Convert the screen surface to a texture and then draw it and destroy its data
