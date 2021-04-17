@@ -18,9 +18,9 @@ SDL_Window *window;
 std::vector<Particle> particles;
 SDL_Renderer *rend;
 bool exitf = false;
-
+//Functions that particle update pointer points to
 void sandUpdate(Particle *p) {
-	engine.setPixel(surface, (*p).x, (*p).y, 0, 0, 0);
+	engine.setPixelRGB(surface, (*p).x, (*p).y, 0, 0, 0);
 	if (engine.getPixel(surface, (*p).x, (*p).y + 1) == 0) {
 		(*p).y++;
 	}
@@ -35,7 +35,7 @@ void sandUpdate(Particle *p) {
 	if ((*p).y > 299) {
 		(*p).y = 299;
 	}
-	engine.copyPixel(surface, (*p).x, (*p).y, (*p).pixel);
+	engine.setPixel(surface, (*p).x, (*p).y, (*p).pixel);
 }
 
 int main(int argc, char **argv) {
@@ -47,8 +47,11 @@ int main(int argc, char **argv) {
 	window = SDL_CreateWindow("Test", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 300, 300, SDL_WINDOW_SHOWN);
 	rend = SDL_CreateRenderer(window, -1, 0);
 	surface = SDL_GetWindowSurface(window);
-	/*engine.setPixel(surface, 1, 1, 73, 20, 20);
-	std::cout << engine.getPixel(surface, 1, 1) << std::endl;*/
+	//How to use RGB correctly
+	engine.setPixelRGB(surface, 1, 1, 255, 20, 20);
+	Gore::RGB c = engine.getPixelRGB(surface, 1, 1);
+	std::cout << (unsigned)c.r << std::endl;
+
 	SDL_Rect testm;
 	testm.x = 0;
 	testm.y = 0;
@@ -66,6 +69,7 @@ int main(int argc, char **argv) {
 				break;
 			}
 		}
+		//Set draw color black and clear the screen with it
 		SDL_SetRenderDrawColor(rend, 0, 0, 0, 0);
 		SDL_RenderClear(rend);
 		//Main logic
@@ -75,6 +79,7 @@ int main(int argc, char **argv) {
 		//Input and creation of new particles
 		int x;
 		int y;
+		//Gets when left mouse button is down and creates a new particle and pushes it back into particles array
 		if (SDL_GetMouseState(&x, &y) & SDL_BUTTON(SDL_BUTTON_LEFT)) {
 			Particle p;
 			p.x = x;
@@ -86,7 +91,9 @@ int main(int argc, char **argv) {
 		}
 		//Convert the screen surface to a texture and then draw it and destroy its data
 		SDL_Texture* test = SDL_CreateTextureFromSurface(rend, surface);
+		//Draw the screen texture
 		SDL_RenderCopy(rend, test, NULL, &testm);
+		//Need this line if you are using renderer else nothing will draw
 		SDL_RenderPresent(rend);
 		SDL_DestroyTexture(test);
 	}
