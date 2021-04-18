@@ -69,11 +69,20 @@ int main(int argc, char **argv) {
 	//Init global and needed variables
 	window = SDL_CreateWindow("Test", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 300, 300, SDL_WINDOW_SHOWN);
 	rend = SDL_CreateRenderer(window, -1, 0);
+	//Use this type if you want just rgb, rgba and rgb functions will not work with each other
 	surface = SDL_CreateRGBSurfaceWithFormat(0, 300, 300, 32, SDL_PIXELFORMAT_RGB888);
+	//Use this type of surface if you want to use rgba
+	//surface = SDL_CreateRGBSurfaceWithFormat(0, 300, 300, 32, SDL_PIXELFORMAT_RGBA8888);
 	//How to use RGB correctly
-	//engine.setPixelRGB(surface, 1, 1, 255, 20, 20);
-//	Gore::RGB c = engine.getPixelRGB(surface, 1, 1);
-//	std::cout << (unsigned)c.r << std::endl;
+	/*engine.setPixelRGB(surface, 1, 1, 255, 20, 20);
+	Gore::RGB c = engine.getPixelRGB(surface, 1, 1);
+	std::cout << (unsigned)c.r << std::endl;*/
+	//How to use RGBA correctly
+	/*engine.setPixelRGBA(surface, 1, 1, 255, 0, 0, 255);
+	engine.setPixelRGBA(surface, 2, 1, 255, 0, 0, 200);
+	Gore::RGB c = engine.getPixelRGBA(surface, 2, 1);
+	std::cout << (unsigned)c.a << std::endl;
+	std::cout << (unsigned)c.r << std::endl;*/
 	int mode = 1;
 	SDL_Rect testm;
 	testm.x = 0;

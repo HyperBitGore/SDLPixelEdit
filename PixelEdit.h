@@ -9,6 +9,7 @@ namespace Gore {
 		Uint8 g;
 		Uint8 b;
 		Uint8 r;
+		Uint8 a;
 	};
 	class Edit {
 	private:
@@ -40,6 +41,14 @@ namespace Gore {
 			pixels[(y*surf->w) + x] = pixel;
 			SDL_UnlockSurface(surf);
 		}
+		//Same as set pixel rgb but added alpha value
+		void setPixelRGBA(SDL_Surface* surf, int x, int y, Uint8 r, Uint8 g, Uint8 b, Uint8 a) {
+			SDL_LockSurface(surf);
+			Uint32* pixels = (Uint32*)surf->pixels;
+			Uint32* pixel = pixels + (y*surf->w) + x;
+			*pixel = SDL_MapRGBA(surf->format, r, g, b, a);
+			SDL_UnlockSurface(surf);
+		}
 		//returns the pixel color of a pixel at a certain x and y
 		Uint32 getPixel(SDL_Surface* surf, int x, int y) {
 			SDL_LockSurface(surf);
@@ -55,6 +64,16 @@ namespace Gore {
 			Uint32 pixel = pixels[(y * surf->w) + x];
 			RGB c;
 			SDL_GetRGB(pixel, surf->format, &c.r, &c.g, &c.b);
+			SDL_UnlockSurface(surf);
+			return c;
+		}
+		//returns rgba value of pixel
+		RGB getPixelRGBA(SDL_Surface* surf, int x, int y) {
+			SDL_LockSurface(surf);
+			Uint32 *pixels = (Uint32 *)surf->pixels;
+			Uint32 pixel = pixels[(y * surf->w) + x];
+			RGB c;
+			SDL_GetRGBA(pixel, surf->format, &c.r, &c.g, &c.b, &c.a);
 			SDL_UnlockSurface(surf);
 			return c;
 		}
