@@ -99,5 +99,28 @@ namespace Gore {
 			SDL_UnlockSurface(surf);
 			return c;
 		}
+		//Functions to compare RGB structs
+		bool compareRGB(RGB rgb1, RGB rgb2) {
+			if (rgb1.r == rgb2.r) {
+				if (rgb1.g == rgb2.g) {
+					if (rgb1.b == rgb2.b) {
+						return true;
+					}
+				}
+			}
+			return false;
+		}
+		bool compareRGBA(RGB rgb1, RGB rgb2) {
+			if (rgb1.r == rgb2.r) {
+				if (rgb1.g == rgb2.g) {
+					if (rgb1.b == rgb2.b) {
+						if (rgb1.a == rgb2.a) {
+							return true;
+						}
+					}
+				}
+			}
+			return false;
+		}
 	};
 }
