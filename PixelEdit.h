@@ -71,8 +71,42 @@ namespace Gore {
 			*pixel = SDL_MapRGB(tex->format, r, g, b);
 			SDL_UnlockSurface(tex);
 		}
+		//Copies raw pixel color data into a pixel checking to make sure point is on screen
+		void setPixelSafeReduced(SDL_Surface* surf, int x, int y, int w, int h, Uint32 pixel, Uint32* pixels) {
+			if (y > 0 && y < h && x > 0 && x < w) {
+				pixels[(y*w) + x] = pixel;
+			}
+			else {
+				return;
+			}
+		}
+		//Copies raw pixel color data into a pixel checking to make sure point is on screen
+		void setPixelSafe(SDL_Surface* surf, int x, int y, Uint32 pixel) {
+			int w = surf->w;
+			int h = surf->h;
+			if (y < 0 || y >  h || x < 0 || x > w) {
+				return;
+			}
+			SDL_LockSurface(surf);
+			Uint32 *pixels = (Uint32*)surf->pixels;
+			pixels[(y*surf->w) + x] = pixel;
+			SDL_UnlockSurface(surf);
+		}
 		//returns the pixel color of a pixel at a certain x and y
 		Uint32 getPixel(SDL_Surface* surf, int x, int y) {
+			SDL_LockSurface(surf);
+			Uint32 *pixels = (Uint32 *)surf->pixels;
+			SDL_UnlockSurface(surf);
+			Uint32 pixel = pixels[(y * surf->w) + x];
+			return pixel;
+		}
+		//Safe version
+		Uint32 getPixelSafe(SDL_Surface* surf, int x, int y) {
+			int w = surf->w;
+			int h = surf->h;
+			if (y < 0 || y >  h || x < 0 || x > w) {
+				return 0;
+			}
 			SDL_LockSurface(surf);
 			Uint32 *pixels = (Uint32 *)surf->pixels;
 			SDL_UnlockSurface(surf);
@@ -85,6 +119,20 @@ namespace Gore {
 			Uint32 *pixels = (Uint32 *)surf->pixels;
 			Uint32 pixel = pixels[(y * surf->w) + x];
 			RGB c;
+			SDL_GetRGB(pixel, surf->format, &c.r, &c.g, &c.b);
+			SDL_UnlockSurface(surf);
+			return c;
+		}
+		RGB getPixelRGBSafe(SDL_Surface* surf, int x, int y) {
+			RGB c = { 0, 0, 0, 0 };
+			int w = surf->w;
+			int h = surf->h;
+			if (y < 0 || y > h || x < 0 || x > w) {
+				return c;
+			}
+			SDL_LockSurface(surf);
+			Uint32 *pixels = (Uint32 *)surf->pixels;
+			Uint32 pixel = pixels[(y * surf->w) + x];
 			SDL_GetRGB(pixel, surf->format, &c.r, &c.g, &c.b);
 			SDL_UnlockSurface(surf);
 			return c;
@@ -121,6 +169,17 @@ namespace Gore {
 				}
 			}
 			return false;
+		}
+		bool compareColor(Uint32 c1, Uint32 c2) {
+			if (c1 == c2) {
+				return true;
+			}
+			return false;
+		}
+		void clearSurface(SDL_Surface* surf, int w, int h) {
+			SDL_LockSurface(surf);
+			std::memset(surf->pixels, 0, (w * h)*(sizeof(surf->pixels)));
+			SDL_UnlockSurface(surf);
 		}
 	};
 }
